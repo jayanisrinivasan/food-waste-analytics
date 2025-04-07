@@ -51,7 +51,7 @@ if os.path.exists(DATA_FILE):
 
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("💰 Cost by Dish")
+        st.subheader("Cost by Dish")
         chart = alt.Chart(dish_summary).mark_bar().encode(
             x=alt.X('dish', sort='-y'),
             y='total_cost',
@@ -60,7 +60,7 @@ if os.path.exists(DATA_FILE):
         st.altair_chart(chart, use_container_width=True)
 
     with col2:
-        st.subheader("⏰ Waste by Hour")
+        st.subheader("Waste by Hour")
         chart2 = alt.Chart(hour_summary).mark_bar().encode(
             x='hour:O',
             y='waste_count',
