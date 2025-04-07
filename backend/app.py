@@ -1,9 +1,12 @@
 from flask import Flask, request, jsonify, send_file
+from flask_cors import CORS
 from datetime import datetime
 import pandas as pd
 import os
 
 app = Flask(__name__)
+CORS(app)
+
 data_file = 'food_waste_data.csv'
 report_file = 'food_waste_report.csv'
 
@@ -51,6 +54,20 @@ def report():
     summary.to_csv(report_file)
 
     return send_file(report_file, as_attachment=True)
+
+@app.route('/charts-data', methods=['GET'])
+def charts_data():
+    df = pd.read_csv(data_file)
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    df['hour'] = df['timestamp'].dt.hour
+
+    dish_summary = df.groupby('dish').agg(total_cost=('estimated_cost', 'sum')).reset_index()
+    hourly_summary = df.groupby('hour').agg(waste_count=('quantity_wasted', 'sum')).reset_index()
+
+    return jsonify({
+        'dish_data': dish_summary.to_dict(orient='records'),
+        'hourly_data': hourly_summary.to_dict(orient='records')
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
